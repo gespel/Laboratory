@@ -65,21 +65,76 @@ find_program(MESON_EXECUTABLE meson REQUIRED)
 set(SLANG_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/modules/Slang")
 set(SLANG_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/slang-build")
 
-# Configure and build Slang using Meson
-add_custom_command(
-    OUTPUT "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${SLANG_BUILD_DIR}"
-    COMMAND ${MESON_EXECUTABLE} setup "${SLANG_BUILD_DIR}" "${SLANG_SOURCE_DIR}" --buildtype=release
-    COMMAND ${MESON_EXECUTABLE} compile -C "${SLANG_BUILD_DIR}"
-    WORKING_DIRECTORY "${SLANG_SOURCE_DIR}"
-    COMMENT "Building Slang library with Meson"
-    VERBATIM
-)
+# Handle macOS universal binary build
+if(APPLE AND CMAKE_OSX_ARCHITECTURES)
+    # Build separate libraries for each architecture
+    set(SLANG_LIBS "")
+    foreach(ARCH ${CMAKE_OSX_ARCHITECTURES})
+        set(ARCH_BUILD_DIR "${SLANG_BUILD_DIR}-${ARCH}")
+        
+        # Create a cross-file for Meson
+        set(CROSS_FILE "${CMAKE_CURRENT_BINARY_DIR}/meson-${ARCH}.ini")
+        file(WRITE "${CROSS_FILE}"
+"[binaries]
+c = 'clang'
+cpp = 'clang++'
+ar = 'ar'
 
-# Create a custom target for Slang
-add_custom_target(SlangLib ALL
-    DEPENDS "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
-)
+[properties]
+c_args = ['-arch', '${ARCH}']
+cpp_args = ['-arch', '${ARCH}']
+c_link_args = ['-arch', '${ARCH}']
+cpp_link_args = ['-arch', '${ARCH}']
+
+[host_machine]
+system = 'darwin'
+cpu_family = '${ARCH}'
+cpu = '${ARCH}'
+endian = 'little'
+")
+        
+        add_custom_command(
+            OUTPUT "${ARCH_BUILD_DIR}/libslang.dylib"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${ARCH_BUILD_DIR}"
+            COMMAND ${MESON_EXECUTABLE} setup "${ARCH_BUILD_DIR}" "${SLANG_SOURCE_DIR}" 
+                    --buildtype=release --cross-file="${CROSS_FILE}"
+            COMMAND ${MESON_EXECUTABLE} compile -C "${ARCH_BUILD_DIR}"
+            WORKING_DIRECTORY "${SLANG_SOURCE_DIR}"
+            COMMENT "Building Slang library for ${ARCH} with Meson"
+            VERBATIM
+        )
+        list(APPEND SLANG_LIBS "${ARCH_BUILD_DIR}/libslang.dylib")
+    endforeach()
+    
+    # Create universal binary using lipo
+    add_custom_command(
+        OUTPUT "${SLANG_BUILD_DIR}/libslang.dylib"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${SLANG_BUILD_DIR}"
+        COMMAND lipo -create ${SLANG_LIBS} -output "${SLANG_BUILD_DIR}/libslang.dylib"
+        DEPENDS ${SLANG_LIBS}
+        COMMENT "Creating universal Slang library"
+        VERBATIM
+    )
+    
+    add_custom_target(SlangLib ALL
+        DEPENDS "${SLANG_BUILD_DIR}/libslang.dylib"
+    )
+else()
+    # Standard single-architecture build
+    add_custom_command(
+        OUTPUT "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${SLANG_BUILD_DIR}"
+        COMMAND ${MESON_EXECUTABLE} setup "${SLANG_BUILD_DIR}" "${SLANG_SOURCE_DIR}" --buildtype=release
+        COMMAND ${MESON_EXECUTABLE} compile -C "${SLANG_BUILD_DIR}"
+        WORKING_DIRECTORY "${SLANG_SOURCE_DIR}"
+        COMMENT "Building Slang library with Meson"
+        VERBATIM
+    )
+
+    add_custom_target(SlangLib ALL
+        DEPENDS "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
+    )
+endif()
 
 # Create an imported library target
 add_library(slang SHARED IMPORTED GLOBAL)
