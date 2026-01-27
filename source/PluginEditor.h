@@ -8,43 +8,44 @@
 
 #pragma once
 
-//#include <JuceHeader.h>
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_gui_extra/juce_gui_extra.h>
 #include "PluginProcessor.h"
 #include <fstream>
 
-class SlangTokeniser : public CodeTokeniser
+class SlangTokeniser : public juce::CodeTokeniser
 {
 public:
-    int readNextToken(CodeDocument::Iterator& source) override;
-    CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
+    int readNextToken(juce::CodeDocument::Iterator& source) override;
+    juce::CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
 };
 
 //==============================================================================
 /**
 */
-class LaboratoryAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener, public Slider::Listener
+class LaboratoryAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Button::Listener, public juce::Slider::Listener
 {
 public:
     LaboratoryAudioProcessorEditor (LaboratoryAudioProcessor&);
     ~LaboratoryAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (Graphics&) override;
+    void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     LaboratoryAudioProcessor& audioProcessor;
-    CodeDocument codeDocument;
+    juce::CodeDocument codeDocument;
     SlangTokeniser tokeniser;
-    CodeEditorComponent codeEditor;
-    TextButton applyButton;
-    TextButton saveFileButton;
-    TextButton loadFileButton;
-    Slider volumeSlider;
-    void buttonClicked (Button* button) override;
-    void sliderValueChanged(Slider* slider) override;
+    juce::CodeEditorComponent codeEditor;
+    juce::TextButton applyButton;
+    juce::TextButton saveFileButton;
+    juce::TextButton loadFileButton;
+    juce::Slider volumeSlider;
+    void buttonClicked (juce::Button* button) override;
+    void sliderValueChanged(juce::Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LaboratoryAudioProcessorEditor)
 };

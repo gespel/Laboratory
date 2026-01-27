@@ -12,12 +12,12 @@
 //==============================================================================
 LaboratoryAudioProcessor::LaboratoryAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
+     : juce::AudioProcessor (juce::AudioProcessor::BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
                       #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
+                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
@@ -29,7 +29,7 @@ LaboratoryAudioProcessor::~LaboratoryAudioProcessor()
 }
 
 //==============================================================================
-const String LaboratoryAudioProcessor::getName() const
+const juce::String LaboratoryAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
@@ -81,12 +81,12 @@ void LaboratoryAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String LaboratoryAudioProcessor::getProgramName (int index)
+const juce::String LaboratoryAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void LaboratoryAudioProcessor::changeProgramName (int index, const String& newName)
+void LaboratoryAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
@@ -116,18 +116,18 @@ void LaboratoryAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool LaboratoryAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool LaboratoryAudioProcessor::isBusesLayoutSupported (const juce::AudioProcessor::BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
+    juce::ignoreUnused (layouts);
     return true;
   #else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
@@ -141,9 +141,9 @@ bool LaboratoryAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
-void LaboratoryAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void LaboratoryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    ScopedNoDenormals noDenormals;
+    juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -185,13 +185,13 @@ bool LaboratoryAudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* LaboratoryAudioProcessor::createEditor()
+juce::AudioProcessorEditor* LaboratoryAudioProcessor::createEditor()
 {
     return new LaboratoryAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void LaboratoryAudioProcessor::getStateInformation (MemoryBlock& destData)
+void LaboratoryAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
@@ -206,7 +206,7 @@ void LaboratoryAudioProcessor::setStateInformation (const void* data, int sizeIn
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new LaboratoryAudioProcessor();
 }
