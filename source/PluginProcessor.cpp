@@ -1,8 +1,17 @@
+/*
+  ==============================================================================
+
+    This file contains the basic framework code for a JUCE plugin processor.
+
+  ==============================================================================
+*/
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
 //==============================================================================
-PluginProcessor::PluginProcessor()
+LaboratoryAudioProcessor::LaboratoryAudioProcessor()
+#ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
@@ -11,20 +20,21 @@ PluginProcessor::PluginProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+#endif
 {
 }
 
-PluginProcessor::~PluginProcessor()
+LaboratoryAudioProcessor::~LaboratoryAudioProcessor()
 {
 }
 
 //==============================================================================
-const juce::String PluginProcessor::getName() const
+const juce::String LaboratoryAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool PluginProcessor::acceptsMidi() const
+bool LaboratoryAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -33,7 +43,7 @@ bool PluginProcessor::acceptsMidi() const
    #endif
 }
 
-bool PluginProcessor::producesMidi() const
+bool LaboratoryAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -42,7 +52,7 @@ bool PluginProcessor::producesMidi() const
    #endif
 }
 
-bool PluginProcessor::isMidiEffect() const
+bool LaboratoryAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -51,53 +61,62 @@ bool PluginProcessor::isMidiEffect() const
    #endif
 }
 
-double PluginProcessor::getTailLengthSeconds() const
+double LaboratoryAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int PluginProcessor::getNumPrograms()
+int LaboratoryAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int PluginProcessor::getCurrentProgram()
+int LaboratoryAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void PluginProcessor::setCurrentProgram (int index)
+void LaboratoryAudioProcessor::setCurrentProgram (int index)
 {
-    juce::ignoreUnused (index);
 }
 
-const juce::String PluginProcessor::getProgramName (int index)
+const juce::String LaboratoryAudioProcessor::getProgramName (int index)
 {
-    juce::ignoreUnused (index);
     return {};
 }
 
-void PluginProcessor::changeProgramName (int index, const juce::String& newName)
+void LaboratoryAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
-    juce::ignoreUnused (index, newName);
 }
 
 //==============================================================================
-void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void LaboratoryAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    this->sampleRate = sampleRate;
+    this->bufferSize = samplesPerBlock;
+    int tokensLength = 0;
+    char* script = (char*)"";
+    Token *tokens = tokenize(script, &tokensLength);
+    std::cout << "Tokens length = " << tokensLength << std::endl;
+    si = createSlangInterpreter(tokens, tokensLength);
+    sbc = createBufferCore(si, (int)sampleRate, samplesPerBlock);
+
+    interpret(si);
+
+    printAllVariables(si);
+    printAllFunctions(si);
+    printAllOscillators(si);
 }
 
-void PluginProcessor::releaseResources()
+void LaboratoryAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
-bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool LaboratoryAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -105,6 +124,8 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
   #else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
+    // Some plugin hosts, such as certain GarageBand versions, will only
+    // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
@@ -118,12 +139,10 @@ bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
     return true;
   #endif
 }
+#endif
 
-void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
-                                              juce::MidiBuffer& midiMessages)
+void LaboratoryAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ignoreUnused (midiMessages);
-
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -143,44 +162,74 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-        // ..do something to the data...
+    auto* channelL = buffer.getWritePointer(0);
+    auto* channelR = buffer.getWritePointer(1);
+
+    if(si && sbc) {
+        rendering = true;
+        float* buf = renderBuffer(sbc);
+
+        for(int sample = 0; sample < buffer.getNumSamples(); sample++) {    
+            //std::cout << buf[sample] << std::endl;
+            channelL[sample] = buf[sample] * volume;
+            channelR[sample] = buf[sample] * volume;
+        }
+        rendering = false;
     }
+    
 }
 
 //==============================================================================
-bool PluginProcessor::hasEditor() const
+bool LaboratoryAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* PluginProcessor::createEditor()
+juce::AudioProcessorEditor* LaboratoryAudioProcessor::createEditor()
 {
-    return new PluginEditor (*this);
+    return new LaboratoryAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
+void LaboratoryAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
 }
 
-void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
+void LaboratoryAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
 }
 
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new PluginProcessor();
+    return new LaboratoryAudioProcessor();
+}
+
+void LaboratoryAudioProcessor::applySlangScript(char* script) {
+    while(rendering) {
+        
+    }
+    if (si != NULL) {
+        destroySlangInterpreter(si);
+    }
+    if (sbc != NULL) {
+        destroyBufferCore(sbc);
+    }
+    int tokensLength = 0;
+    Token *tokens = tokenize(script, &tokensLength);
+    std::cout << "Tokens length = " << tokensLength << std::endl;
+    si = createSlangInterpreter(tokens, tokensLength);
+    sbc = createBufferCore(si, sampleRate, bufferSize);
+
+    interpret(si);
+
+    printAllVariables(si);
+    printAllFunctions(si);
+    printAllOscillators(si);
 }
