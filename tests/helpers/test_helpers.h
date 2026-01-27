@@ -7,7 +7,7 @@
  *
  * Example usage (screenshots the plugin)
  *
-  runWithinPluginEditor ([&] (PluginProcessor& plugin) {
+  runWithinPluginEditor ([&] (LaboratoryAudioProcessor& plugin) {
     auto snapshot = plugin.getActiveEditor()->createComponentSnapshot (plugin.getActiveEditor()->getLocalBounds(), true, 2.0f);
     auto file = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDocumentsDirectory).getChildFile ("snapshot.jpeg");
     file.deleteFile();
@@ -19,9 +19,9 @@
    });
 
  */
-[[maybe_unused]] static void runWithinPluginEditor (const std::function<void (juce::PluginProcessor& plugin)>& testCode)
+[[maybe_unused]] static void runWithinPluginEditor (const std::function<void (LaboratoryAudioProcessor& plugin)>& testCode)
 {
-    juce::PluginProcessor plugin;
+    LaboratoryAudioProcessor plugin;
     const auto editor = plugin.createEditorIfNeeded();
 
     testCode (plugin);
