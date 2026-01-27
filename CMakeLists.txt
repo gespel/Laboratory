@@ -256,14 +256,57 @@ target_link_libraries(SharedCode
 # Link the JUCE plugin targets our SharedCode target
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)
 
+# Set RPATH so executables can find the Slang library
+if(APPLE)
+    set_target_properties("${PROJECT_NAME}" PROPERTIES
+        BUILD_RPATH "${SLANG_BUILD_DIR}"
+        INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
+    )
+elseif(UNIX)
+    set_target_properties("${PROJECT_NAME}" PROPERTIES
+        BUILD_RPATH "${SLANG_BUILD_DIR}"
+        INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib"
+    )
+endif()
+
 # IPP support, comment out to disable
 include(PamplejuceIPP)
 
 # Everything related to the tests target
 include(Tests)
 
+# Set RPATH for Tests executable to find Slang library
+if(TARGET Tests)
+    if(APPLE)
+        set_target_properties(Tests PROPERTIES
+            BUILD_RPATH "${SLANG_BUILD_DIR}"
+            INSTALL_RPATH "@executable_path;@loader_path"
+        )
+    elseif(UNIX)
+        set_target_properties(Tests PROPERTIES
+            BUILD_RPATH "${SLANG_BUILD_DIR}"
+            INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib"
+        )
+    endif()
+endif()
+
 # A separate target for Benchmarks (keeps the Tests target fast)
 include(Benchmarks)
+
+# Set RPATH for Benchmarks executable to find Slang library
+if(TARGET Benchmarks)
+    if(APPLE)
+        set_target_properties(Benchmarks PROPERTIES
+            BUILD_RPATH "${SLANG_BUILD_DIR}"
+            INSTALL_RPATH "@executable_path;@loader_path"
+        )
+    elseif(UNIX)
+        set_target_properties(Benchmarks PROPERTIES
+            BUILD_RPATH "${SLANG_BUILD_DIR}"
+            INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib"
+        )
+    endif()
+endif()
 
 # Output some config for CI (like our PRODUCT_NAME)
 include(GitHubENV)
