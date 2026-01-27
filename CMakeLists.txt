@@ -109,6 +109,9 @@ include(SharedCodeDefaults)
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
+# Add Slang include directory
+target_include_directories(SharedCode INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/modules/Slang")
+
 # Adds a BinaryData target for embedding assets into the binary
 include(Assets)
 
