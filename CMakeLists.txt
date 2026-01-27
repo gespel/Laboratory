@@ -60,6 +60,47 @@ add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 # This adds the melatonin inspector module
 add_subdirectory (modules/melatonin_inspector)
 
+# Build Slang library with Meson
+find_program(MESON_EXECUTABLE meson REQUIRED)
+set(SLANG_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/modules/Slang")
+set(SLANG_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/slang-build")
+
+# Configure and build Slang using Meson
+add_custom_command(
+    OUTPUT "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${SLANG_BUILD_DIR}"
+    COMMAND ${MESON_EXECUTABLE} setup "${SLANG_BUILD_DIR}" "${SLANG_SOURCE_DIR}" --buildtype=release
+    COMMAND ${MESON_EXECUTABLE} compile -C "${SLANG_BUILD_DIR}"
+    WORKING_DIRECTORY "${SLANG_SOURCE_DIR}"
+    COMMENT "Building Slang library with Meson"
+    VERBATIM
+)
+
+# Create a custom target for Slang
+add_custom_target(SlangLib ALL
+    DEPENDS "${SLANG_BUILD_DIR}/libslang.so" "${SLANG_BUILD_DIR}/libslang.dylib" "${SLANG_BUILD_DIR}/slang.dll"
+)
+
+# Create an imported library target
+add_library(slang SHARED IMPORTED GLOBAL)
+add_dependencies(slang SlangLib)
+
+# Set library location based on platform
+if(APPLE)
+    set_target_properties(slang PROPERTIES
+        IMPORTED_LOCATION "${SLANG_BUILD_DIR}/libslang.dylib"
+    )
+elseif(WIN32)
+    set_target_properties(slang PROPERTIES
+        IMPORTED_LOCATION "${SLANG_BUILD_DIR}/slang.dll"
+        IMPORTED_IMPLIB "${SLANG_BUILD_DIR}/slang.lib"
+    )
+else()
+    set_target_properties(slang PROPERTIES
+        IMPORTED_LOCATION "${SLANG_BUILD_DIR}/libslang.so"
+    )
+endif()
+
 # See `docs/CMake API.md` in the JUCE repo for all config options
 juce_add_plugin("${PROJECT_NAME}"
     # Icons for the standalone app
@@ -147,6 +188,7 @@ target_link_libraries(SharedCode
     INTERFACE
     Assets
     melatonin_inspector
+    slang
     juce_audio_utils
     juce_audio_processors
     juce_dsp
