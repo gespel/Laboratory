@@ -97,7 +97,7 @@ endian = 'little'
             OUTPUT "${ARCH_BUILD_DIR}/libslang.dylib"
             COMMAND ${CMAKE_COMMAND} -E make_directory "${ARCH_BUILD_DIR}"
             COMMAND ${MESON_EXECUTABLE} setup "${ARCH_BUILD_DIR}" "${SLANG_SOURCE_DIR}" 
-                    --buildtype=release --cross-file="${CROSS_FILE}"
+                    --buildtype=release --cross-file=${CROSS_FILE}
             COMMAND ${MESON_EXECUTABLE} compile -C "${ARCH_BUILD_DIR}"
             WORKING_DIRECTORY "${SLANG_SOURCE_DIR}"
             COMMENT "Building Slang library for ${ARCH} with Meson"
