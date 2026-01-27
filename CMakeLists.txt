@@ -262,6 +262,30 @@ if(APPLE)
         BUILD_RPATH "${SLANG_BUILD_DIR}"
         INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
     )
+    
+    # Copy Slang library into plugin bundles after build
+    add_custom_command(TARGET "${PROJECT_NAME}" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+                "${SLANG_BUILD_DIR}/libslang.dylib" 
+                "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>/Contents/Frameworks/"
+        COMMAND install_name_tool -change "@rpath/libslang.dylib" 
+                "@loader_path/../Frameworks/libslang.dylib"
+                "$<TARGET_FILE:${PROJECT_NAME}>"
+        COMMENT "Copying Slang library into plugin bundle"
+    )
+    
+    # Also handle standalone app
+    add_custom_command(TARGET "${PROJECT_NAME}_Standalone" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}_Standalone>/Contents/Frameworks"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different 
+                "${SLANG_BUILD_DIR}/libslang.dylib" 
+                "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}_Standalone>/Contents/Frameworks/"
+        COMMAND install_name_tool -change "@rpath/libslang.dylib" 
+                "@loader_path/../Frameworks/libslang.dylib"
+                "$<TARGET_FILE:${PROJECT_NAME}_Standalone>"
+        COMMENT "Copying Slang library into standalone app bundle"
+    )
 elseif(UNIX)
     set_target_properties("${PROJECT_NAME}" PROPERTIES
         BUILD_RPATH "${SLANG_BUILD_DIR}"
