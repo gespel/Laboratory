@@ -16,7 +16,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     codeDocument.replaceAllContent("//your slang script goes here! :D");
-    codeEditor.setFont(juce::Font(juce::Font::getDefaultMonospacedFontName(), 20.0f, juce::Font::plain));
+    codeEditor.setFont(Font(Font::getDefaultMonospacedFontName(), 20.0f, Font::plain));
     codeEditor.setTabSize(4, true);
     addAndMakeVisible(&codeEditor);
 
@@ -36,7 +36,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     volumeSlider.setValue(1);
     volumeSlider.setTextValueSuffix(" Output");
     volumeSlider.addListener(this);
-    volumeSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    volumeSlider.setSliderStyle(Slider::SliderStyle::Rotary);
     addAndMakeVisible(&volumeSlider);
 
     setSize (800, 600);
@@ -48,14 +48,14 @@ LaboratoryAudioProcessorEditor::~LaboratoryAudioProcessorEditor()
 }
 
 //==============================================================================
-void LaboratoryAudioProcessorEditor::paint (juce::Graphics& g)
+void LaboratoryAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
-    g.setColour (juce::Colours::white);
-    g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.setColour (Colours::white);
+    g.setFont (FontOptions (15.0f));
+    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void LaboratoryAudioProcessorEditor::resized()
@@ -69,24 +69,24 @@ void LaboratoryAudioProcessorEditor::resized()
     volumeSlider.setBounds(width - 150, height - 60, 140, 70);
 }
 
-void LaboratoryAudioProcessorEditor::sliderValueChanged (juce::Slider* slider) {
+void LaboratoryAudioProcessorEditor::sliderValueChanged (Slider* slider) {
     audioProcessor.volume = slider->getValue();
 }
 
-void LaboratoryAudioProcessorEditor::buttonClicked (juce::Button* button) {
+void LaboratoryAudioProcessorEditor::buttonClicked (Button* button) {
     if (button == &applyButton) {
         char *p = strdup((char*)codeDocument.getAllContent().toStdString().c_str());
         audioProcessor.applySlangScript(p);
     }
     if (button == &saveFileButton) {
-        auto* chooser = new juce::FileChooser("Bitte Datei auswählen...", juce::File{}, "*.slang");
+        auto* chooser = new FileChooser("Bitte Datei auswählen...", File{}, "*.slang");
 
         chooser->launchAsync(
-            juce::FileBrowserComponent::saveMode |
-            juce::FileBrowserComponent::canSelectFiles,
-            [this, chooser](const juce::FileChooser& fc)
+            FileBrowserComponent::saveMode |
+            FileBrowserComponent::canSelectFiles,
+            [this, chooser](const FileChooser& fc)
             {
-                juce::File file = fc.getResult();
+                File file = fc.getResult();
 
                 DBG("Save Datei: " << file.getFullPathName());
                 std::ofstream saveFile(file.getFullPathName().toStdString());
@@ -98,14 +98,14 @@ void LaboratoryAudioProcessorEditor::buttonClicked (juce::Button* button) {
         );
     }
     if (button == &loadFileButton) {
-        auto* chooser = new juce::FileChooser("Bitte Datei auswählen...", juce::File{}, "*.slang");
+        auto* chooser = new FileChooser("Bitte Datei auswählen...", File{}, "*.slang");
 
         chooser->launchAsync(
-            juce::FileBrowserComponent::openMode |
-            juce::FileBrowserComponent::canSelectFiles,
-            [this, chooser](const juce::FileChooser& fc)
+            FileBrowserComponent::openMode |
+            FileBrowserComponent::canSelectFiles,
+            [this, chooser](const FileChooser& fc)
             {
-                juce::File file = fc.getResult();
+                File file = fc.getResult();
                 if (file.existsAsFile()) {
                     DBG("Gewählte Datei: " << file.getFullPathName());
                     std::ifstream loadFile(file.getFullPathName().toStdString());
@@ -126,14 +126,14 @@ void LaboratoryAudioProcessorEditor::buttonClicked (juce::Button* button) {
     }
 }
 
-int SlangTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
+int SlangTokeniser::readNextToken(CodeDocument::Iterator& source)
 {
     source.skipWhitespace();
     
     auto firstChar = source.peekNextChar();
     
     if (firstChar == 0)
-        return juce::CPlusPlusCodeTokeniser::tokenType_error;
+        return CPlusPlusCodeTokeniser::tokenType_error;
     
     // Kommentare
     if (firstChar == '/')
@@ -142,68 +142,68 @@ int SlangTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
         if (source.peekNextChar() == '/')
         {
             while (!source.isEOF() && source.nextChar() != '\n') {}
-            return juce::CPlusPlusCodeTokeniser::tokenType_comment;
+            return CPlusPlusCodeTokeniser::tokenType_comment;
         }
         // Wenn kein zweites '/', gib Operator/Punctuation zurück
-        return juce::CPlusPlusCodeTokeniser::tokenType_punctuation;
+        return CPlusPlusCodeTokeniser::tokenType_punctuation;
     }
     
     // Zahlen
-    if (juce::CharacterFunctions::isDigit(firstChar))
+    if (CharacterFunctions::isDigit(firstChar))
     {
         source.skip();
-        while (!source.isEOF() && (juce::CharacterFunctions::isDigit(source.peekNextChar()) || source.peekNextChar() == '.'))
+        while (!source.isEOF() && (CharacterFunctions::isDigit(source.peekNextChar()) || source.peekNextChar() == '.'))
             source.skip();
-        return juce::CPlusPlusCodeTokeniser::tokenType_integer;
+        return CPlusPlusCodeTokeniser::tokenType_integer;
     }
     
     // Identifier und Keywords
-    if (juce::CharacterFunctions::isLetter(firstChar) || firstChar == '_')
+    if (CharacterFunctions::isLetter(firstChar) || firstChar == '_')
     {
-        juce::String token;
-        while (!source.isEOF() && (juce::CharacterFunctions::isLetterOrDigit(source.peekNextChar()) || source.peekNextChar() == '_'))
-            token += juce::String::charToString(source.nextChar());
+        String token;
+        while (!source.isEOF() && (CharacterFunctions::isLetterOrDigit(source.peekNextChar()) || source.peekNextChar() == '_'))
+            token += String::charToString(source.nextChar());
         
         // Control flow keywords
         if (token == "fn" || token == "return" || token == "if" || token == "for" || token == "while")
-            return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+            return CPlusPlusCodeTokeniser::tokenType_keyword;
         
         // Oscillator keywords
         if (token == "sineosc" || token == "truesineosc" || token == "sawtoothosc" || token == "wavetableosc" ||
             token == "squareosc" || token == "triangleosc" || token == "terrainosc")
-            return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+            return CPlusPlusCodeTokeniser::tokenType_keyword;
         
         // Filter and effect keywords
         if (token == "lowpassfilter" || token == "highpassfilter")
-            return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+            return CPlusPlusCodeTokeniser::tokenType_keyword;
         
         // Other keywords
         if (token == "random" || token == "randomint" || token == "linenvelope" || 
             token == "stepsequencer" || token == "inputa" || token == "inputb" || token == "inputc" || token == "inputd")
-            return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+            return CPlusPlusCodeTokeniser::tokenType_keyword;
         
-        return juce::CPlusPlusCodeTokeniser::tokenType_identifier;
+        return CPlusPlusCodeTokeniser::tokenType_identifier;
     }
     
     // Operatoren und sonstige Zeichen
     source.skip();
-    return juce::CPlusPlusCodeTokeniser::tokenType_punctuation;
+    return CPlusPlusCodeTokeniser::tokenType_punctuation;
 }
 
-juce::CodeEditorComponent::ColourScheme SlangTokeniser::getDefaultColourScheme()
+CodeEditorComponent::ColourScheme SlangTokeniser::getDefaultColourScheme()
 {
-    juce::CodeEditorComponent::ColourScheme scheme;
+    CodeEditorComponent::ColourScheme scheme;
     
-    scheme.set("Error", juce::Colour(0xffcc0000));
-    scheme.set("Comment", juce::Colour(0xff00aa00));
-    scheme.set("Keyword", juce::Colour(0xff5588ff));
-    scheme.set("Operator", juce::Colour(0xffcfcfcf));
-    scheme.set("Identifier", juce::Colour(0xffcfcfcf));
-    scheme.set("Integer", juce::Colour(0xffaa7700));
-    scheme.set("Float", juce::Colour(0xffaa7700));
-    scheme.set("String", juce::Colour(0xff007700));
-    scheme.set("Bracket", juce::Colour(0xffcfcfcf));
-    scheme.set("Punctuation", juce::Colour(0xffcfcfcf));
+    scheme.set("Error", Colour(0xffcc0000));
+    scheme.set("Comment", Colour(0xff00aa00));
+    scheme.set("Keyword", Colour(0xff5588ff));
+    scheme.set("Operator", Colour(0xffcfcfcf));
+    scheme.set("Identifier", Colour(0xffcfcfcf));
+    scheme.set("Integer", Colour(0xffaa7700));
+    scheme.set("Float", Colour(0xffaa7700));
+    scheme.set("String", Colour(0xff007700));
+    scheme.set("Bracket", Colour(0xffcfcfcf));
+    scheme.set("Punctuation", Colour(0xffcfcfcf));
     
     return scheme;
 }

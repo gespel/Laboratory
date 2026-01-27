@@ -12,39 +12,39 @@
 #include "PluginProcessor.h"
 #include <fstream>
 
-class SlangTokeniser : public juce::CodeTokeniser
+class SlangTokeniser : public CodeTokeniser
 {
 public:
-    int readNextToken(juce::CodeDocument::Iterator& source) override;
-    juce::CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
+    int readNextToken(CodeDocument::Iterator& source) override;
+    CodeEditorComponent::ColourScheme getDefaultColourScheme() override;
 };
 
 //==============================================================================
 /**
 */
-class LaboratoryAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Button::Listener, public juce::Slider::Listener
+class LaboratoryAudioProcessorEditor  : public AudioProcessorEditor, public Button::Listener, public Slider::Listener
 {
 public:
     LaboratoryAudioProcessorEditor (LaboratoryAudioProcessor&);
     ~LaboratoryAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     LaboratoryAudioProcessor& audioProcessor;
-    juce::CodeDocument codeDocument;
+    CodeDocument codeDocument;
     SlangTokeniser tokeniser;
-    juce::CodeEditorComponent codeEditor;
-    juce::TextButton applyButton;
-    juce::TextButton saveFileButton;
-    juce::TextButton loadFileButton;
-    juce::Slider volumeSlider;
-    void buttonClicked (juce::Button* button) override;
-    void sliderValueChanged(juce::Slider* slider) override;
+    CodeEditorComponent codeEditor;
+    TextButton applyButton;
+    TextButton saveFileButton;
+    TextButton loadFileButton;
+    Slider volumeSlider;
+    void buttonClicked (Button* button) override;
+    void sliderValueChanged(Slider* slider) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LaboratoryAudioProcessorEditor)
 };
