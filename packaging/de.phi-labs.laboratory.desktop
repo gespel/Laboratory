@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Laboratory
+GenericName=Audio Plugin
+Comment=JUCE Audio Application
+Exec=Laboratory
+Icon=de.phi-labs.laboratory
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Music;
+Keywords=audio;music;synthesizer;plugin;
+StartupNotify=true
