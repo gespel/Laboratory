@@ -209,7 +209,7 @@ jobs:
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: Laboratory.flatpak
-          manifest-path: packaging/de.phi-labs.laboratory.yml
+          manifest-path: packaging/de.philabs.laboratory.yml
           cache-key: flatpak-builder-${{ github.sha }}
 
       - name: Upload Flatpak

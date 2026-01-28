@@ -1,4 +1,4 @@
-app-id: de.phi-labs.laboratory
+app-id: de.philabs.laboratory
 runtime: org.freedesktop.Platform
 runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
@@ -29,7 +29,7 @@ modules:
       - type: dir
         path: ..
     post-install:
-      - install -Dm644 packaging/de.phi-labs.laboratory.desktop /app/share/applications/de.phi-labs.laboratory.desktop
-      - install -Dm644 packaging/de.phi-labs.laboratory.metainfo.xml /app/share/metainfo/de.phi-labs.laboratory.metainfo.xml
-      - install -Dm644 packaging/icon.png /app/share/icons/hicolor/256x256/apps/de.phi-labs.laboratory.png
+      - install -Dm644 packaging/de.philabs.laboratory.desktop /app/share/applications/de.philabs.laboratory.desktop
+      - install -Dm644 packaging/de.philabs.laboratory.metainfo.xml /app/share/metainfo/de.philabs.laboratory.metainfo.xml
+      - install -Dm644 packaging/icon.png /app/share/icons/hicolor/256x256/apps/de.philabs.laboratory.png
       - install -Dm755 Builds/Laboratory_artefacts/Release/Standalone/Laboratory /app/bin/Laboratory

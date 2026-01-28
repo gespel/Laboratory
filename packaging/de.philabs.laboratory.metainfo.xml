@@ -10,8 +10,8 @@
       Laboratory is a professional audio synthesis and processing application built with JUCE.
     </p>
   </description>
-  <launchable type="desktop-id">de.phi-labs.laboratory.desktop</launchable>
-  <developer id="de.phi-labs">
+  <launchable type="desktop-id">de.philabs.laboratory.desktop</launchable>
+  <developer id="de.philabs">
     <name>PhiLabs</name>
   </developer>
   <url type="homepage">https://github.com/yourusername/Laboratory</url>
