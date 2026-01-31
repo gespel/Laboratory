@@ -1,0 +1,5 @@
+add_test( [==[one is equal to one]==] /home/sten/AudioProgramming/Laboratory/build/Tests [==[one is equal to one]==]  )
+set_tests_properties( [==[one is equal to one]==] PROPERTIES WORKING_DIRECTORY /home/sten/AudioProgramming/Laboratory/build SKIP_RETURN_CODE 4)
+add_test( [==[Plugin instance]==] /home/sten/AudioProgramming/Laboratory/build/Tests [==[Plugin instance]==]  )
+set_tests_properties( [==[Plugin instance]==] PROPERTIES WORKING_DIRECTORY /home/sten/AudioProgramming/Laboratory/build SKIP_RETURN_CODE 4)
+set( Tests_TESTS [==[one is equal to one]==] [==[Plugin instance]==])
