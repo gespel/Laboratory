@@ -57,8 +57,10 @@ add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 # Add any other modules you want modules here, before the juce_add_plugin call
 # juce_add_module(modules/my_module)
 
-# This adds the melatonin inspector module
-add_subdirectory (modules/melatonin_inspector)
+# This adds the melatonin inspector module (disabled for Flatpak)
+if(NOT FLATPAK_BUILD)
+    add_subdirectory (modules/melatonin_inspector)
+endif()
 
 # Build Slang library with Meson
 find_program(MESON_EXECUTABLE meson REQUIRED)
@@ -242,8 +244,15 @@ target_compile_definitions(SharedCode
 target_link_libraries(SharedCode
     INTERFACE
     Assets
-    melatonin_inspector
+    $<$<NOT:$<BOOL:${FLATPAK_BUILD}>>:melatonin_inspector>
     slang
+    juce_core
+    juce_data_structures
+    juce_events
+    juce_graphics
+    juce_audio_basics
+    juce_audio_devices
+    juce_audio_formats
     juce_audio_utils
     juce_audio_processors
     juce_dsp
@@ -255,6 +264,32 @@ target_link_libraries(SharedCode
 
 # Link the JUCE plugin targets our SharedCode target
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)
+
+# Workaround for Flatpak: Explicitly link JUCE modules to ALL plugin format targets
+# because INTERFACE library doesn't propagate properly in Flatpak environment
+if(FLATPAK_BUILD)
+    set(JUCE_MODULES_FOR_FLATPAK
+        juce_core
+        juce_data_structures
+        juce_events
+        juce_graphics
+        juce_audio_basics
+        juce_audio_devices
+        juce_audio_formats
+        juce_audio_utils
+        juce_audio_processors
+        juce_dsp
+        juce_gui_basics
+        juce_gui_extra
+    )
+    
+    foreach(FORMAT ${FORMATS})
+        if(TARGET "${PROJECT_NAME}_${FORMAT}")
+            target_link_libraries("${PROJECT_NAME}_${FORMAT}" PRIVATE ${JUCE_MODULES_FOR_FLATPAK} SharedCode)
+            target_sources("${PROJECT_NAME}_${FORMAT}" PRIVATE ${SourceFiles})
+        endif()
+    endforeach()
+endif()
 
 # Set RPATH so executables can find the Slang library
 if(APPLE)

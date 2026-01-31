@@ -29,3 +29,14 @@ cmake-build-debug
 cmake-build-release
 cmake-build-relwithdebinfo
 packaging/Output/*
+
+# Flatpak build artifacts
+builddir/
+.flatpak-builder/
+build-release/
+*.flatpak
+flatpak-build*.log
+build-flatpak.sh
+check-build-status.sh
+fake-pkg-config.sh
+build-install.sh

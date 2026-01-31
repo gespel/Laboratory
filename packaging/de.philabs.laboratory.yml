@@ -4,27 +4,44 @@ runtime-version: '23.08'
 sdk: org.freedesktop.Sdk
 command: Laboratory
 finish-args:
-  # X11 + XShm access
   - --share=ipc
   - --socket=x11
-  # Wayland access
   - --socket=wayland
-  # Audio access
   - --socket=pulseaudio
-  # ALSA access for direct hardware
   - --device=all
-  # File access
   - --filesystem=home
-  # Network (for potential license checks)
   - --share=network
-  # DRI access for hardware acceleration
   - --device=dri
 
 modules:
+  - name: webkit-compat
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/pkgconfig
+      - |
+        cat > /app/lib/pkgconfig/webkit2gtk-4.0.pc << 'EOF'
+        prefix=/usr
+        libdir=/usr/lib/x86_64-linux-gnu
+        includedir=/usr/include/webkitgtk-4.1
+        
+        Name: webkit2gtk-4.0
+        Description: WebKit2GTK+
+        Version: 2.50.0
+        Requires: gtk+-3.0
+        Libs: -L${libdir} -lwebkit2gtk-4.1 -ljavascriptcoregtk-4.1
+        Cflags: -I${includedir}
+        EOF
+      
   - name: laboratory
     buildsystem: cmake-ninja
+    build-options:
+      build-args:
+        - --share=network
+      env:
+        PKG_CONFIG_PATH: /app/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
+      - -DFLATPAK_BUILD=ON
     sources:
       - type: dir
         path: ..
@@ -32,4 +49,5 @@ modules:
       - install -Dm644 packaging/de.philabs.laboratory.desktop /app/share/applications/de.philabs.laboratory.desktop
       - install -Dm644 packaging/de.philabs.laboratory.metainfo.xml /app/share/metainfo/de.philabs.laboratory.metainfo.xml
       - install -Dm644 packaging/icon.png /app/share/icons/hicolor/256x256/apps/de.philabs.laboratory.png
-      - install -Dm755 Builds/Laboratory_artefacts/Release/Standalone/Laboratory /app/bin/Laboratory
+      - install -Dm755 Laboratory_artefacts/Release/Standalone/Laboratory /app/bin/Laboratory
+      - install -Dm755 slang-build/libslang.so /app/lib/libslang.so
