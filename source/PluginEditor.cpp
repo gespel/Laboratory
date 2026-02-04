@@ -170,7 +170,7 @@ int SlangTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
         
         // Oscillator keywords
         if (token == "sineosc" || token == "truesineosc" || token == "sawtoothosc" || token == "wavetableosc" ||
-            token == "squareosc" || token == "triangleosc" || token == "terrainosc")
+            token == "squareosc" || token == "triangleosc" || token == "terrainosc" || token == "randomosc")
             return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
         
         // Filter and effect keywords
