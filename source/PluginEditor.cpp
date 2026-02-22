@@ -176,6 +176,10 @@ int SlangTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
         // Filter and effect keywords
         if (token == "lowpassfilter" || token == "highpassfilter")
             return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+
+        if (token == "springreverb") {
+            return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
+        }
         
         // Other keywords
         if (token == "random" || token == "randomint" || token == "linenvelope" || 
