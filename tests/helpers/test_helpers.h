@@ -22,7 +22,7 @@
 [[maybe_unused]] static void runWithinPluginEditor (const std::function<void (LaboratoryAudioProcessor& plugin)>& testCode)
 {
     LaboratoryAudioProcessor plugin;
-    const auto editor = plugin.createEditorIfNeeded();
+    const auto editor = plugin.createEditorIfNecessary();
 
     testCode (plugin);
 
