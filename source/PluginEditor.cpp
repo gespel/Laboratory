@@ -183,7 +183,7 @@ int SlangTokeniser::readNextToken(juce::CodeDocument::Iterator& source)
         
         // Other keywords
         if (token == "random" || token == "randomint" || token == "linenvelope" || 
-            token == "stepsequencer" || token == "inputa" || token == "inputb" || token == "inputc" || token == "inputd")
+            token == "stepsequencer" || token == "randomstepsequencer" || token == "inputa" || token == "inputb" || token == "inputc" || token == "inputd")
             return juce::CPlusPlusCodeTokeniser::tokenType_keyword;
         
         return juce::CPlusPlusCodeTokeniser::tokenType_identifier;
