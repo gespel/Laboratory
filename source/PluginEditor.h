@@ -44,6 +44,8 @@ private:
     juce::TextButton saveFileButton;
     juce::TextButton loadFileButton;
     juce::Slider volumeSlider;
+    juce::Slider dataASlider;
+    juce::Slider dataBSlider;
     void buttonClicked (juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
 

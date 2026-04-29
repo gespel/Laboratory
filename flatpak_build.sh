@@ -4,7 +4,8 @@ set -e
 echo "Building Laboratory Flatpak..."
 
 # Build and install the Flatpak
-flatpak-builder --user --install --force-clean builddir packaging/de.philabs.laboratory.yml
+#flatpak-builder --user --install --force-clean builddir packaging/de.philabs.laboratory.yml
+flatpak-builder --user --install builddir packaging/de.philabs.laboratory.yml
 
 echo ""
 echo "✓ Flatpak build completed successfully!"

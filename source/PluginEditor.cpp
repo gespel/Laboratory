@@ -32,6 +32,13 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     loadFileButton.addListener(this);
     addAndMakeVisible(&loadFileButton);
 
+    dataASlider.setRange(0, 100, 0.1);
+    dataASlider.setValue(1);
+    dataASlider.setTextValueSuffix(" Data A");
+    dataASlider.addListener(this);
+    dataASlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    addAndMakeVisible(&dataASlider);
+
     volumeSlider.setRange(0, 3, 0.01);
     volumeSlider.setValue(1);
     volumeSlider.setTextValueSuffix(" Output");
@@ -67,10 +74,13 @@ void LaboratoryAudioProcessorEditor::resized()
     saveFileButton.setBounds(180, height - 43, 140, 35);
     loadFileButton.setBounds(330, height - 43, 140, 35);
     volumeSlider.setBounds(width - 150, height - 60, 140, 70);
+    dataASlider.setBounds(width - 300, height - 60, 140, 70);
 }
 
 void LaboratoryAudioProcessorEditor::sliderValueChanged (juce::Slider* slider) {
+    //if (slider.getName(""))
     audioProcessor.volume = slider->getValue();
+    //audioProcessor.si->inputs[0][0] = 
 }
 
 void LaboratoryAudioProcessorEditor::buttonClicked (juce::Button* button) {
