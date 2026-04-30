@@ -12,6 +12,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "PluginProcessor.h"
 #include <fstream>
+#include "melatonin_inspector/melatonin_inspector.h"
 
 class SlangTokeniser : public juce::CodeTokeniser
 {
@@ -32,6 +33,8 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    melatonin::Inspector inspector { *this };
+
 
 private:
     // This reference is provided as a quick way for your editor to

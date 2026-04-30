@@ -13,6 +13,11 @@
 LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioProcessor& p)
     : juce::AudioProcessorEditor (&p), audioProcessor (p), codeEditor(codeDocument, &tokeniser)
 {
+    // open the inspector window
+    //inspector.setVisible(true); 
+    // enable the inspector
+    //inspector.toggle(true);
+    
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     codeDocument.replaceAllContent("//your slang script goes here! :D");
