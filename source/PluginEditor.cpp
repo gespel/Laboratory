@@ -42,6 +42,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataASlider.setTextValueSuffix(" Data A");
     dataASlider.addListener(this);
     dataASlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    dataASlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataASlider);
 
     dataBSlider.setRange(0, 100, 0.1);
@@ -49,6 +50,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataBSlider.setTextValueSuffix(" Data B");
     dataBSlider.addListener(this);
     dataBSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    dataBSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataBSlider);
 
     dataCSlider.setRange(0, 100, 0.1);
@@ -56,6 +58,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataCSlider.setTextValueSuffix(" Data C");
     dataCSlider.addListener(this);
     dataCSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    dataCSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataCSlider);
 
     dataDSlider.setRange(0, 100, 0.1);
@@ -63,6 +66,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataDSlider.setTextValueSuffix(" Data D");
     dataDSlider.addListener(this);
     dataDSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    dataDSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataDSlider);
 
     volumeSlider.setRange(0, 3, 0.01);
@@ -72,7 +76,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     volumeSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     addAndMakeVisible(&volumeSlider);
 
-    setSize (800, 600);
+    setSize (1200, 800);
     setResizable(true, true);
 }
 
@@ -95,12 +99,15 @@ void LaboratoryAudioProcessorEditor::resized()
 {
     float width = getWidth();
     float height = getHeight();
-    codeEditor.setBounds(10, 10, width - 20, height - 60);
+    codeEditor.setBounds(10, 10, width - 120, height - 60);
     applyButton.setBounds(30, height - 43, 140, 35);
     saveFileButton.setBounds(180, height - 43, 140, 35);
     loadFileButton.setBounds(330, height - 43, 140, 35);
     volumeSlider.setBounds(width - 150, height - 60, 140, 70);
-    dataASlider.setBounds(width - 300, height - 60, 140, 70);
+    dataASlider.setBounds(width - 100, 10, 95, 100);
+    dataBSlider.setBounds(width - 100, 120, 95, 100);
+    dataCSlider.setBounds(width - 100, 240, 95, 100);
+    dataDSlider.setBounds(width - 100, 360, 95, 100);
 }
 
 void LaboratoryAudioProcessorEditor::sliderValueChanged (juce::Slider* slider) {
