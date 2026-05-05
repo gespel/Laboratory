@@ -33,7 +33,7 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-    melatonin::Inspector inspector { *this };
+    //melatonin::Inspector inspector { *this };
 
 
 private:
