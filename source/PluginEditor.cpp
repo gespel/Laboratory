@@ -44,6 +44,27 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataASlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
     addAndMakeVisible(&dataASlider);
 
+    dataBSlider.setRange(0, 100, 0.1);
+    dataBSlider.setValue(1);
+    dataBSlider.setTextValueSuffix(" Data B");
+    dataBSlider.addListener(this);
+    dataBSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    addAndMakeVisible(&dataBSlider);
+
+    dataCSlider.setRange(0, 100, 0.1);
+    dataCSlider.setValue(1);
+    dataCSlider.setTextValueSuffix(" Data C");
+    dataCSlider.addListener(this);
+    dataCSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    addAndMakeVisible(&dataCSlider);
+
+    dataDSlider.setRange(0, 100, 0.1);
+    dataDSlider.setValue(1);
+    dataDSlider.setTextValueSuffix(" Data D");
+    dataDSlider.addListener(this);
+    dataDSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
+    addAndMakeVisible(&dataDSlider);
+
     volumeSlider.setRange(0, 3, 0.01);
     volumeSlider.setValue(1);
     volumeSlider.setTextValueSuffix(" Output");

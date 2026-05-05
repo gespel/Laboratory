@@ -49,6 +49,8 @@ private:
     juce::Slider volumeSlider;
     juce::Slider dataASlider;
     juce::Slider dataBSlider;
+    juce::Slider dataCSlider;
+    juce::Slider dataDSlider;
     void buttonClicked (juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
 
