@@ -12,7 +12,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "PluginProcessor.h"
 #include <fstream>
-#include "melatonin_inspector/melatonin_inspector.h"
+//#include "melatonin_inspector/melatonin_inspector.h"
 
 class SlangTokeniser : public juce::CodeTokeniser
 {
