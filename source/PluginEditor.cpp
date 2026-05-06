@@ -113,6 +113,9 @@ void LaboratoryAudioProcessorEditor::resized()
 void LaboratoryAudioProcessorEditor::sliderValueChanged (juce::Slider* slider) {
     audioProcessor.volume = volumeSlider.getValue();
     audioProcessor.si->inputs[0][0] = dataASlider.getValue();
+    audioProcessor.si->inputs[1][0] = dataBSlider.getValue();
+    audioProcessor.si->inputs[2][0] = dataCSlider.getValue();
+    audioProcessor.si->inputs[3][0] = dataDSlider.getValue();
 }
 
 void LaboratoryAudioProcessorEditor::buttonClicked (juce::Button* button) {
