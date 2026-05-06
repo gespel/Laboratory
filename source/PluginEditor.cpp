@@ -37,7 +37,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     loadFileButton.addListener(this);
     addAndMakeVisible(&loadFileButton);
 
-    dataASlider.setRange(0, 100, 0.1);
+    dataASlider.setRange(0, 100, 0.001);
     dataASlider.setValue(1);
     dataASlider.setTextValueSuffix(" Data A");
     dataASlider.addListener(this);
@@ -45,7 +45,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataASlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataASlider);
 
-    dataBSlider.setRange(0, 100, 0.1);
+    dataBSlider.setRange(0, 100, 0.001);
     dataBSlider.setValue(1);
     dataBSlider.setTextValueSuffix(" Data B");
     dataBSlider.addListener(this);
@@ -53,7 +53,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataBSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataBSlider);
 
-    dataCSlider.setRange(0, 100, 0.1);
+    dataCSlider.setRange(0, 100, 0.001);
     dataCSlider.setValue(1);
     dataCSlider.setTextValueSuffix(" Data C");
     dataCSlider.addListener(this);
@@ -61,7 +61,7 @@ LaboratoryAudioProcessorEditor::LaboratoryAudioProcessorEditor (LaboratoryAudioP
     dataCSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
     addAndMakeVisible(&dataCSlider);
 
-    dataDSlider.setRange(0, 100, 0.1);
+    dataDSlider.setRange(0, 100, 0.001);
     dataDSlider.setValue(1);
     dataDSlider.setTextValueSuffix(" Data D");
     dataDSlider.addListener(this);
